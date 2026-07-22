@@ -1,5 +1,10 @@
 .DS_Store
 node_modules/
+
+# Source requirement docs hold the real refloor_auth credential (MOCK-005):
+# keep them out of the committed repo. Requirements are extracted into docs/.
+*.docx
+
 __pycache__/
 *.pyc
 .env

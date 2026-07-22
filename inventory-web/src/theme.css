@@ -1,0 +1,635 @@
+/* ==========================================================================
+   theme.css — brand tokens + dark base layout (WEB-010/011/012/013)
+   Dark theme only. Exact brand hexes as CSS custom properties; derived darker
+   navy shades used only for panel/background layering (allowed by WEB-010).
+   ========================================================================== */
+
+:root {
+  /* --- Exact brand palette (WEB-010) --- */
+  --navy: #262262; /* base background */
+  --white: #ffffff; /* text */
+  --gold: #d29b3c; /* warnings / accents */
+  --blue: #30aee4; /* interactive / selected */
+  --brown: #5b381f; /* accent */
+
+  /* --- Derived navy shades (layering only, WEB-010) --- */
+  --navy-950: #14113a; /* app background, deepest */
+  --navy-900: #1b1848; /* main content background */
+  --navy-850: #211d57; /* elevated surface */
+  --navy-800: #2e2a72; /* panels / cards */
+  --navy-700: #3a3585; /* borders / hover */
+  --navy-600: #4a4499; /* strong border */
+
+  /* --- Status cell colors (WEB-012): cell backgrounds w/ dark text --- */
+  --status-green: #5cbd6a;
+  --status-yellow: #e9c14a;
+  --status-red: #e26363;
+  --status-text: #17123a; /* dark text on colored cells */
+
+  /* --- Typography --- */
+  --font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica,
+    Arial, sans-serif;
+
+  --sidebar-width: 300px;
+  --header-height: 68px;
+
+  --text-muted: rgba(255, 255, 255, 0.66);
+  --text-faint: rgba(255, 255, 255, 0.4);
+  --border: rgba(255, 255, 255, 0.12);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+  margin: 0;
+}
+
+body {
+  font-family: var(--font-sans);
+  color: var(--white);
+  background: var(--navy-950);
+  font-size: 14px;
+  line-height: 1.4;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Tabular numerals everywhere numbers are shown in grids (WEB-013). */
+.tabnum,
+table td,
+table th {
+  font-variant-numeric: tabular-nums;
+}
+
+button {
+  font-family: inherit;
+  cursor: pointer;
+}
+
+a {
+  color: var(--blue);
+}
+
+/* ============================ App shell layout ============================ */
+
+.app-shell {
+  display: grid;
+  grid-template-columns: var(--sidebar-width) 1fr;
+  grid-template-rows: var(--header-height) 1fr;
+  grid-template-areas:
+    'header header'
+    'sidebar main';
+  height: 100vh;
+  overflow: hidden;
+}
+
+.app-header {
+  grid-area: header;
+}
+.app-sidebar {
+  grid-area: sidebar;
+  overflow-y: auto;
+}
+.app-main {
+  grid-area: main;
+  overflow: auto;
+  padding: 24px 28px;
+  background: var(--navy-900);
+}
+
+/* Responsive: sidebar collapses under 900px (WEB-002). It stacks above the
+   main content and becomes horizontally scrollable rather than clipping. */
+@media (max-width: 900px) {
+  .app-shell {
+    grid-template-columns: 1fr;
+    grid-template-rows: var(--header-height) auto 1fr;
+    grid-template-areas:
+      'header'
+      'sidebar'
+      'main';
+    height: 100vh;
+    overflow: auto;
+  }
+  .app-sidebar {
+    max-height: none;
+    border-right: none;
+    border-bottom: 1px solid var(--border);
+  }
+}
+
+/* ============================== Header =================================== */
+
+.header {
+  height: var(--header-height);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 24px;
+  background: var(--navy);
+  border-bottom: 1px solid var(--navy-700);
+}
+
+.header-titles {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+.header-title {
+  font-size: 20px;
+  font-weight: 700;
+  letter-spacing: 0.2px;
+}
+.header-divider {
+  width: 1px;
+  height: 28px;
+  background: var(--navy-600);
+}
+.header-subtitle {
+  color: var(--text-muted);
+  font-size: 13px;
+}
+
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+}
+.header-updated {
+  text-align: right;
+  font-size: 12px;
+  line-height: 1.3;
+}
+.header-updated .label {
+  color: var(--text-faint);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  font-size: 10px;
+}
+.header-updated .value {
+  color: var(--white);
+  font-weight: 600;
+}
+.header-clock {
+  color: var(--text-muted);
+  font-size: 12px;
+}
+
+.refresh-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 38px;
+  height: 38px;
+  border-radius: 8px;
+  border: 1px solid var(--navy-600);
+  background: var(--navy-800);
+  color: var(--blue);
+  font-size: 18px;
+  transition: background 0.15s ease;
+}
+.refresh-btn:hover {
+  background: var(--navy-700);
+}
+.refresh-btn:active {
+  transform: rotate(90deg);
+}
+
+.stale-badge {
+  display: inline-block;
+  background: var(--gold);
+  color: var(--status-text);
+  font-weight: 700;
+  font-size: 11px;
+  padding: 3px 9px;
+  border-radius: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+}
+
+/* ============================== Sidebar ================================= */
+
+.sidebar {
+  background: var(--navy);
+  border-right: 1px solid var(--navy-700);
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.nav-menu {
+  padding: 16px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  border-bottom: 1px solid var(--navy-700);
+}
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 11px 14px;
+  border-radius: 8px;
+  border: none;
+  background: transparent;
+  color: var(--white);
+  text-align: left;
+  font-size: 14px;
+  font-weight: 500;
+  width: 100%;
+}
+.nav-item:hover:not(:disabled) {
+  background: var(--navy-800);
+}
+.nav-item.active {
+  background: var(--blue);
+  color: var(--status-text);
+  font-weight: 700;
+}
+.nav-item:disabled {
+  color: var(--text-faint);
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+.nav-item .nav-icon {
+  width: 18px;
+  text-align: center;
+}
+
+.context-panel {
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  overflow-y: auto;
+}
+
+.panel {
+  background: var(--navy-850);
+  border: 1px solid var(--navy-700);
+  border-radius: 10px;
+  padding: 14px;
+}
+.panel-title {
+  font-size: 13px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  color: var(--blue);
+  margin: 0 0 12px;
+}
+
+/* Form controls */
+.field {
+  margin-bottom: 12px;
+}
+.field:last-child {
+  margin-bottom: 0;
+}
+.field label {
+  display: block;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  color: var(--text-muted);
+  margin-bottom: 5px;
+}
+select,
+input[type='text'],
+input[type='number'] {
+  width: 100%;
+  padding: 8px 10px;
+  border-radius: 7px;
+  border: 1px solid var(--navy-600);
+  background: var(--navy-900);
+  color: var(--white);
+  font-family: inherit;
+  font-size: 13px;
+}
+select:focus,
+input:focus {
+  outline: none;
+  border-color: var(--blue);
+}
+.readonly-field .value {
+  padding: 7px 10px;
+  border-radius: 7px;
+  background: var(--navy-900);
+  border: 1px solid var(--navy-700);
+  font-size: 13px;
+  min-height: 34px;
+}
+.readonly-field.install-date .value {
+  color: var(--status-red);
+  font-weight: 700;
+}
+
+.btn {
+  padding: 8px 12px;
+  border-radius: 7px;
+  border: 1px solid var(--navy-600);
+  background: var(--navy-800);
+  color: var(--white);
+  font-size: 13px;
+  font-weight: 600;
+}
+.btn:hover {
+  background: var(--navy-700);
+}
+.btn-block {
+  width: 100%;
+}
+
+/* ============================== Tables ================================= */
+
+.page-title {
+  font-size: 22px;
+  font-weight: 700;
+  margin: 0 0 4px;
+}
+.page-caption {
+  color: var(--text-muted);
+  font-size: 13px;
+  margin: 0 0 18px;
+  max-width: 900px;
+}
+
+.grid-wrap {
+  overflow-x: auto;
+  border: 1px solid var(--navy-700);
+  border-radius: 10px;
+  background: var(--navy-850);
+}
+
+table.grid {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+table.grid th {
+  text-align: left;
+  padding: 10px 12px;
+  background: var(--navy-800);
+  color: var(--text-muted);
+  font-weight: 700;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  border-bottom: 1px solid var(--navy-700);
+  white-space: nowrap;
+  position: sticky;
+  top: 0;
+}
+table.grid th.num,
+table.grid td.num {
+  text-align: right;
+}
+table.grid td {
+  padding: 9px 12px;
+  border-bottom: 1px solid var(--navy-800);
+}
+table.grid tr:last-child td {
+  border-bottom: none;
+}
+table.grid tbody tr:hover td {
+  background: rgba(48, 174, 228, 0.06);
+}
+
+th.sortable {
+  cursor: pointer;
+  user-select: none;
+}
+th.sortable:hover {
+  color: var(--white);
+}
+th .sort-arrow {
+  color: var(--blue);
+  margin-left: 4px;
+}
+
+/* Collapsible category group header rows (WEB-022) */
+tr.group-header td {
+  background: var(--brown);
+  color: var(--white);
+  font-weight: 700;
+  cursor: pointer;
+  letter-spacing: 0.4px;
+  text-transform: uppercase;
+  font-size: 12px;
+}
+tr.group-header .caret {
+  display: inline-block;
+  width: 14px;
+  color: var(--gold);
+}
+
+/* Colored availability cells (WEB-012/024/046) — dark text on color bg */
+td.status-cell {
+  font-weight: 700;
+  color: var(--status-text);
+  text-align: right;
+}
+td.status-cell.green {
+  background: var(--status-green);
+}
+td.status-cell.yellow {
+  background: var(--status-yellow);
+}
+td.status-cell.red {
+  background: var(--status-red);
+}
+
+td.remainder-short {
+  color: var(--status-red);
+  font-weight: 700;
+}
+
+tr.total-row td {
+  font-weight: 700;
+  background: var(--navy-800);
+  border-top: 2px solid var(--navy-600);
+}
+
+/* ======================= Status dots / icons =========================== */
+
+.status-dot {
+  display: inline-block;
+  width: 11px;
+  height: 11px;
+  border-radius: 50%;
+  margin-right: 8px;
+  vertical-align: middle;
+}
+.status-dot.green {
+  background: var(--status-green);
+}
+.status-dot.yellow {
+  background: var(--status-yellow);
+}
+.status-dot.red {
+  background: var(--status-red);
+}
+
+.item-status-icon {
+  font-weight: 800;
+  font-size: 15px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+.item-status-icon.ready {
+  color: var(--status-green);
+}
+.item-status-icon.attention {
+  color: var(--status-yellow);
+}
+.item-status-icon.short {
+  color: var(--status-red);
+}
+
+.status-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 7px 0;
+  font-size: 13px;
+}
+
+/* ========================= Callouts / banners ========================== */
+
+.callout-warning {
+  background: var(--gold);
+  color: var(--status-text);
+  border-radius: 10px;
+  padding: 14px 16px;
+  font-weight: 600;
+  margin-bottom: 20px;
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+}
+.callout-warning .icon {
+  font-size: 18px;
+  line-height: 1;
+}
+
+.banner-error {
+  background: var(--status-red);
+  color: var(--status-text);
+  border-radius: 10px;
+  padding: 12px 16px;
+  font-weight: 700;
+  margin-bottom: 16px;
+}
+
+.empty-state {
+  padding: 40px;
+  text-align: center;
+  color: var(--text-muted);
+}
+
+.loading-note,
+.error-note {
+  padding: 16px;
+  color: var(--text-muted);
+}
+.error-note {
+  color: var(--status-red);
+}
+
+/* ============================ Auth gate ================================= */
+
+.auth-screen {
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--navy-950);
+}
+.auth-card {
+  background: var(--navy-850);
+  border: 1px solid var(--navy-700);
+  border-radius: 14px;
+  padding: 32px;
+  width: 360px;
+  max-width: 90vw;
+}
+.auth-card h1 {
+  font-size: 20px;
+  margin: 0 0 4px;
+}
+.auth-card .sub {
+  color: var(--text-muted);
+  font-size: 13px;
+  margin-bottom: 20px;
+}
+.auth-card .dev-note {
+  margin-top: 16px;
+  font-size: 11px;
+  color: var(--gold);
+  background: rgba(210, 155, 60, 0.12);
+  border: 1px solid var(--gold);
+  border-radius: 8px;
+  padding: 8px 10px;
+}
+.auth-card .btn-primary {
+  width: 100%;
+  margin-top: 14px;
+  background: var(--blue);
+  color: var(--status-text);
+  border: none;
+  padding: 11px;
+  border-radius: 8px;
+  font-weight: 700;
+  font-size: 14px;
+}
+
+/* ============================ Status page ============================== */
+
+.health-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 12px;
+  margin-bottom: 16px;
+}
+.health-stat {
+  background: var(--navy-850);
+  border: 1px solid var(--navy-700);
+  border-radius: 10px;
+  padding: 12px 14px;
+}
+.health-stat .k {
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--text-faint);
+}
+.health-stat .v {
+  font-size: 17px;
+  font-weight: 700;
+  margin-top: 3px;
+}
+.health-stat .v.bad {
+  color: var(--status-red);
+}
+.health-stat .v.good {
+  color: var(--status-green);
+}
+
+.section-block {
+  margin-bottom: 28px;
+}
+.section-title {
+  font-size: 16px;
+  font-weight: 700;
+  margin: 0 0 10px;
+}
+.inline-badges {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  flex-wrap: wrap;
+}

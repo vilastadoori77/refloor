@@ -1,0 +1,31 @@
+{
+  "name": "inventory-flash-replica",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Inventory Availability Flash — local/Azure replica (mock BC API + inventory service + React website)",
+  "workspaces": [
+    "shared",
+    "mock-bc-api",
+    "inventory-service",
+    "inventory-web"
+  ],
+  "scripts": {
+    "dev": "concurrently -n mock,svc,web -c blue,green,magenta \"npm:dev -w mock-bc-api\" \"npm:dev -w inventory-service\" \"npm:dev -w inventory-web\"",
+    "dev:mock": "npm run dev -w mock-bc-api",
+    "dev:svc": "npm run dev -w inventory-service",
+    "dev:web": "npm run dev -w inventory-web",
+    "build": "npm run build -w inventory-web",
+    "test": "vitest run",
+    "test:watch": "vitest"
+  },
+  "devDependencies": {
+    "concurrently": "^9.1.2",
+    "tsx": "^4.19.2",
+    "typescript": "^5.7.2",
+    "vitest": "^2.1.8"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}

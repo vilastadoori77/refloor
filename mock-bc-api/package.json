@@ -1,0 +1,23 @@
+{
+  "name": "mock-bc-api",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Mock Business Central / Azure Middleware API (SPEC 01). Port 4000.",
+  "scripts": {
+    "dev": "tsx watch src/index.ts",
+    "start": "tsx src/index.ts",
+    "build": "tsc --noEmit",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@inventory/shared": "*",
+    "cors": "^2.8.5",
+    "express": "^4.21.2"
+  },
+  "devDependencies": {
+    "@types/cors": "^2.8.17",
+    "@types/express": "^4.17.21",
+    "@types/node": "^22.10.2"
+  }
+}

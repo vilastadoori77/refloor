@@ -4,6 +4,51 @@ Per the deviation rule (SPEC 05 §6): specs change by review, recorded here.
 
 ---
 
+## 2026-07-21 — Verification pushback fixes (PB-V-001/002/005)
+
+Independent verification run
+([`../verification/VERIFICATION-PUSHBACK.md`](../verification/VERIFICATION-PUSHBACK.md))
+returned "verified with findings". Fixed:
+
+| PB-V | Severity | Fix |
+|---|---|---|
+| PB-V-001 | Blocker (hygiene) | The two `.docx` requirement files were still **tracked** in git despite `*.docx` in `.gitignore` (ignore does not untrack). Untracked via `git rm --cached` (files remain on disk). `git ls-files \| grep -i docx` now empty → MOCK-005 satisfied. |
+| PB-V-002 | Medium (quality) | `inventory-service/src/consolidator.ts` held one raw `\x00` byte — the `keyOf` composite-key delimiter written as a literal null instead of an escape. Replaced with an explicit `\\u0000` escape: **identical runtime keys** (256 rows, 0 blank-category, unique keys intact), source now clean UTF-8. tsc + 50 tests still green. |
+| PB-V-005 | Doc clarity | BUILD-VERIFICATION §8 credential-hygiene check tightened to require `git ls-files` (not ignore-alone) + `git check-ignore`. |
+
+Still open, handed to the reviewer (not code defects): **PB-V-003** (browser
+Stage 3/4 drills MAN-301…309 / MAN-401) and **PB-V-004** (live Azure, blocked on
+DEC-001/DEC-002). PB-V-006 (the eight build deviations) was accepted by the
+verifier with no change.
+
+---
+
+## 2026-07-21 — Implementation build (Stages 1–5, suite v1.2)
+
+First code build of the whole replica against spec suite v1.2. All four packages
+typecheck; **50 automated tests pass** (21 contract + 29 unit); the live stack
+was smoke-tested end-to-end (consolidation, filters, project split, outage
+last-good, project-503). Deviations and design decisions logged below per the
+rule — none change an approved **M** requirement's intent; they are additive or
+substitutions already permitted by the spec.
+
+| # | Deviation / decision | Spec touchpoint | Rationale |
+|---|---|---|---|
+| 1 | **Added a `shared/` workspace** (the typed contract: BC shapes, `AvailabilityConfig`/`DEFAULT_CONFIG`, `ConsolidatedItem`, `Snapshot`, envelopes) beyond the four dirs in SPEC 00 §8. | SPEC 00 §8, PB-007 | PB-007 explicitly wants "a shared typed contract compiled across service and web." One package is the cleanest way; §8 layout otherwise unchanged. |
+| 2 | **Runtime = `tsx`, not compiled JS**, in dev *and* Azure. `shared` exports raw `.ts`; apps start via `tsx src/index.ts`; deploy ships the monorepo. | SPEC 04 (AZ-061) | Simplest for a replica; avoids a build/emit step. If JS emit is added later, switch App Service startup to `node`. |
+| 3 | **`bcClient.getProjects()` added** beyond the four enumerated BC clients. | SVC-042 | Needed for the sale-header proxy (`GET /api/projects` ← MOCK-060). |
+| 4 | **Consolidator item-metadata master** — demand-only item+locations are enriched (category/i360Id/sqft) from the inventory+PO feeds by `itemNo`. | SVC-002, WEB-022/023 | Demand rows lack metadata; without this, a shortage row demanded where an item isn't stocked rendered under a blank category group. Caught by live smoke test, not fixtures. |
+| 5 | **`*.docx` gitignored** (source requirement docs hold the real `refloor_auth` credential). | MOCK-005 | Keeps the credential out of the committed repo; requirements already extracted to `docs/`. TEST-024.5's automated form is therefore a CI/manual grep over source, since the only copy of the secret is the now-ignored `.docx`. |
+| 6 | **AZ-012 resolved to the injected-base option:** web reads `VITE_API_BASE_URL` (unset in dev → relative `/api` via Vite proxy; set at Azure build → absolute service URL). Not the same-origin-rewrite option. | AZ-012 | Both were spec-permitted; injected base matches the deploy scripts and keeps WEB-003 (browser → service only). |
+| 7 | **Mock `/admin/outage` on Azure is protected by IP restriction** (`--mock-cidr`), not a token guard — the mock does not implement `ADMIN_TOKEN` gating (the service does). | AZ-011a | AZ-011a allows "internal / IP-restricted **or** token-gated"; IP restriction is used for the mock. Token gating the mock is a later hardening if wanted. |
+| 8 | **Not built (Should/Could, per spec priority):** WEB-029 (grid virtualization), WEB-030 (Ordered tooltip), WEB-050 rendered as a native type-ahead `<select>` rather than a free-text search, SVC-034 (App Insights wiring — optional), SVC-001b (deferred), AZ-050/051 (Could). | various | All non-**M**; recorded so their absence is a decision, not an oversight. |
+
+No **M** requirement was dropped or reinterpreted. ASM-002/003 remain 🔶 OPEN and
+config-driven (TEST-016 green). Next gate: the manual Stage 1–4 checkpoint drills
+in [`manual_tests/`](manual_tests/) with the reviewer.
+
+---
+
 ## 2026-07-21 — Test catalog pushback resolution
 
 Applied the five findings from the automated/manual test coverage review.
